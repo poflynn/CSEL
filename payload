@@ -19,7 +19,7 @@ if [ -z "$avUpdated" ]; then :; else addPosPoints ${#avUpdated[@]}*7
     else
       recordMiss 'AV '
     fi
-  else 
+  else
     recordMiss 'AV '
   fi
 fi
@@ -45,7 +45,7 @@ fi
 
 badFile(){ #Check for bad files
 if [ -z "$badFile" ]; then :; else addPosPoints ${#badFile[@]}*10
-for i in "${badFile[@]}" ; do 
+for i in "${badFile[@]}" ; do
   if [ -e "$i" ] ; then
     recordMiss 'File management '
   else
@@ -89,7 +89,7 @@ for i in "${backdoor[@]}" ; do
   fi
 done
 fi
-} 
+}
 
 changePassword(){ #Check certain users for blank passwords
 if [ -z "$changePassword" ]; then :; else addPosPoints ${#changePassword[@]}*5
@@ -137,7 +137,7 @@ checkKernel(){
 if [ -z "$checkKernel" ]; then :; else addPosPoints 7
   currentKernel=$(uname -r | awk -F. '{printf($1 "%02d\n", $2) }')
   initialKernelFormatted=$(echo $initialKernel | awk -F. '{printf($1 "%02d\n", $2) }')
-  if (( "$currentKernel" > "$initialKernelFormatted" )) ; then 
+  if (( "$currentKernel" > "$initialKernelFormatted" )) ; then
     recordHit 'Kernel Updated' 7
   else
     recordMiss 'Kernel'
@@ -146,7 +146,7 @@ fi
 }
 
 checkForRoot(){ #Gotta be root
-if [ "$EUID" -ne 0 ] ;  then 
+if [ "$EUID" -ne 0 ] ;  then
 echo "csel must be run as root"
 exit
 fi
@@ -165,7 +165,7 @@ fi
 }
 
 checkPassHist(){ #Check /etc/pam.d/common-password for password history
-if [ -z "$checkPassHist" ]; then :; else addPosPoints 7 
+if [ -z "$checkPassHist" ]; then :; else addPosPoints 7
   if [[ `grep remember /etc/pam.d/common-password` ]] ; then #does remember exist in the file?
     if [ `grep -o -P '(?<=remember=).*(?=\ )' /etc/pam.d/common-password` ] ; then #Check for value somewhere in the middle of the line
       currentPassHist=$(grep -oP '(?<=remember=).*(?=\ )' /etc/pam.d/common-password )
@@ -184,7 +184,7 @@ fi
 }
 
 checkPassLength(){ #Check /etc/pam.d/common-password for min length
-if [ -z "$checkPassLength" ]; then :; else addPosPoints 7 
+if [ -z "$checkPassLength" ]; then :; else addPosPoints 7
   if [[ `grep minlen /etc/pam.d/common-password` ]] ; then #does remember exist in the file?
     if [ `grep -o -P '(?<=minlen=).*(?=\ )' /etc/pam.d/common-password` ] ; then #Check for value somewhere in the middle of the line
       currentPassLength=$(grep -oP '(?<=minlen=).*(?=\ )' /etc/pam.d/common-password )
@@ -225,7 +225,7 @@ fi
 
 disableAutoLogin(){ #Check /etc/lightdm/lightdm.conf for an auto login account?
 if [ -z "$disableAutoLogin" ];then :; else addPosPoints 5
-  if [[ $(cat /etc/lightdm/lightdm.conf | grep ^autologin-user) ]] ; then
+  if [[ $(cat /etc/lightdm/lightdm.conf | grep ^autologin-user=) ]] ; then
     recordMiss 'Auto login'
   else
 	recordHit 'Autologin disabled.' 5
@@ -243,7 +243,7 @@ if [ -z "$disableGuest" ]; then :; else addPosPoints 5
 fi
 }
 
-drawHead(){ #Create the Score Report html 
+drawHead(){ #Create the Score Report html
   echo "<!doctype html><html><head><title>CSEL Score Report</title></head><body>" > $index
   echo '<table align="center" cellpadding="10"><tr><td><img src="/home/CYBERPATRIOT_DO_NOT_REMOVE/logo.png"></td><td><div align="center"><H2>Cyberpatriot Scoring Engine:Linux v0.4</H2></div></td><td><img src="/home/CYBERPATRIOT_DO_NOT_REMOVE/iguana.png"></td></tr></table><br><H2>Your Score: #TotalScore# out of #PossiblePoints#</H2><hr>' >> $index
 }
@@ -340,10 +340,10 @@ fi
 }
 
 goodUser(){	#Penalize for deleting good users
-if [ -z "$goodUser" ]; then :; else 
+if [ -z "$goodUser" ]; then :; else
 for i in "${goodUser[@]}" ; do
   if getent passwd $i > /dev/null 2>&1; then :; else #If goodUser exists, do nothing, else penalize
-    recordPenalty "User "$i" deleted" -10		
+    recordPenalty "User "$i" deleted" -10
   fi
 done
 fi
@@ -363,7 +363,7 @@ maxLoginTries(){ #Check max login threshold
 if [ -z "$maxLoginTries" ]; then :; else addPosPoints 7
 currentMax=$(cat /etc/login.defs | grep ^LOGIN_RETRIES | awk '{print $2;}') #Look at login.defs
   if (( "$currentMax" <= "$maxLoginTries" )) ; then
-    recordHit 'Max Login Tries is at most '$maxLoginTries'.' 7		
+    recordHit 'Max Login Tries is at most '$maxLoginTries'.' 7
   else
     recordMiss 'Password Policy'
   fi
@@ -424,7 +424,7 @@ removeAdmin(){ #Check certain uses to see if they have been removed from admin
 if [ -z "$removeAdmin" ]; then :; else addPosPoints ${#removeAdmin[@]}*10
 for i in "${removeAdmin[@]}" ; do
   if [[ $(getent group sudo | grep $i) ]] ; then #If the user exists in admin group
-      recordMiss Admin 
+      recordMiss Admin
 	else
 	  recordHit $i' removed from Admin group.' 10
 	fi
@@ -432,7 +432,7 @@ done
 fi
 }
 
-secureSudoers(){ #Check /etc/suders for specific text
+secureSudoers(){ #Check /etc/sudoers for specific text
 if [ -z "$secureSudoers" ]; then :; else  addPosPoints ${#secureSudoers[@]}*8
 for i in "${secureSudoers[@]}" ; do
   if [[ $(sudo cat /etc/sudoers | grep $i) ]] ; then #If specific text exists in sudoers file
