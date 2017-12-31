@@ -509,7 +509,8 @@ checkHosts
 badCron
 checkFirewall
 checkStartup
-checkForensicsQuestion
+checkForensicsQuestion1
+checkForensicsQuestion2
 updatePackListsInt
 updateAutoInstall
 avUpdated
